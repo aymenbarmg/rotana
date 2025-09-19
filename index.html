@@ -7,7 +7,8 @@
 
   <!-- أيقونة PWA -->
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="5361675802271414421.jpg" type="image/jpeg" />
+  <link rel="icon" href="112233.jpg" type="image/jpeg" />
+  <link rel="apple-touch-icon" href="112233.jpg" />
   <meta name="theme-color" content="#28a745" />
 
   <style>
@@ -27,13 +28,26 @@
     .actions{display:flex;gap:8px;margin-top:auto}
     button{background:var(--accent);color:#fff;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
     button.secondary{background:#eee;color:#111}
-    .cart{position:fixed;left:18px;top:80px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.12);width:320px;max-width:92vw;padding:12px}
+
+    /* عربة التسوّق أسفل الصفحة */
+    .cart{
+      position:fixed;
+      bottom:0;
+      left:0;
+      right:0;
+      background:#fff;
+      border-top:3px solid var(--accent);
+      box-shadow:0 -6px 18px rgba(0,0,0,0.12);
+      max-height:40vh;
+      overflow:auto;
+      padding:12px;
+    }
     .cart h3{margin:0 0 8px 0}
-    .cart .items{max-height:300px;overflow:auto;margin-bottom:10px}
+    .cart .items{max-height:200px;overflow:auto;margin-bottom:10px}
     .cart .item{display:flex;gap:8px;align-items:center;border-bottom:1px dashed #eee;padding:8px 0}
     .cart .item img{width:48px;height:48px;object-fit:cover;border-radius:6px}
     .empty{color:#777}
-    footer{padding:18px;text-align:center;color:#666}
+    footer{padding:18px;text-align:center;color:#666;margin-bottom:70px} /* ترك مسافة لعربة التسوّق */
     @media (max-width:800px){header{flex-direction:column;gap:10px}}
   </style>
 </head>
