@@ -1,0 +1,15 @@
+{
+  "name": "روتانا - متجر الموبايلات",
+  "short_name": "روتانا",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#28a745",
+  "theme_color": "#28a745",
+  "icons": [
+    {
+      "src": "icons112233.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

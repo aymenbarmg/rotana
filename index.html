@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>روتانا - متجر الموبايلات</title>
+
+  <!-- أيقونة PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="5361675802271414421.jpg" type="image/jpeg" />
+  <meta name="theme-color" content="#28a745" />
+
+  <style>
+    :root{--accent:#28a745}
+    body{font-family:Tahoma,Arial,Helvetica,sans-serif;margin:0;background:#f6f7fb;color:#111}
+    header{background:var(--accent);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:12px}
+    header img{height:55px;border-radius:8px;background:#fff;padding:4px}
+    .brand{font-size:22px;font-weight:700}
+    .container{max-width:1100px;margin:18px auto;padding:0 16px}
+    .controls{display:flex;gap:8px;margin:14px 0;flex-wrap:wrap}
+    select,input[type=search]{padding:8px;border-radius:8px;border:1px solid #ddd}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+    .card{background:#fff;border-radius:10px;padding:12px;box-shadow:0 6px 18px rgba(10,20,40,0.06);display:flex;flex-direction:column;gap:8px}
+    .card img{width:100%;height:170px;object-fit:contain;border-radius:8px;background:#fafafa}
+    .card h4{margin:0;font-size:15px}
+    .price{font-weight:700;color:var(--accent)}
+    .actions{display:flex;gap:8px;margin-top:auto}
+    button{background:var(--accent);color:#fff;border:0;padding:8px 10px;border-radius:8px;cursor:pointer}
+    button.secondary{background:#eee;color:#111}
+    .cart{position:fixed;left:18px;top:80px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.12);width:320px;max-width:92vw;padding:12px}
+    .cart h3{margin:0 0 8px 0}
+    .cart .items{max-height:300px;overflow:auto;margin-bottom:10px}
+    .cart .item{display:flex;gap:8px;align-items:center;border-bottom:1px dashed #eee;padding:8px 0}
+    .cart .item img{width:48px;height:48px;object-fit:cover;border-radius:6px}
+    .empty{color:#777}
+    footer{padding:18px;text-align:center;color:#666}
+    @media (max-width:800px){header{flex-direction:column;gap:10px}}
+  </style>
+</head>
+<body>
+  <header>
+    <img src="112233.jpg" alt="شعار روتانا" />
+    <div>
+      <div class="brand">روتانا | متجر الموبايلات</div>
+      <div class="tag">أفضل أجهزة آبل الأصلية</div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="controls">
+      <select id="category">
+        <option value="apple" selected>آبل</option>
+      </select>
+      <input id="search" type="search" placeholder="ابحث عن منتج..." />
+    </div>
+
+    <main>
+      <section id="products" class="grid"></section>
+    </main>
+  </div>
+
+  <aside class="cart" id="cart">
+    <h3>عربة التسوّق</h3>
+    <div class="items" id="cartItems"><div class="empty">السلة فارغة</div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong>المجموع: <span id="total">0</span> د.ع</strong>
+      <button id="checkout">الدفع</button>
+    </div>
+  </aside>
+
+  <footer>حقوق الطبع © روتانا</footer>
+
+  <script>
+    // منتجات آبل فقط
+    const products = [
+      {id:1,name:"iPhone 14 Pro - 256GB",cat:"apple",price:220000,image:"https://m.media-amazon.com/images/I/71T5NVOgbpL._AC_SL1500_.jpg"},
+      {id:2,name:"iPhone 13 - 128GB",cat:"apple",price:180000,image:"https://m.media-amazon.com/images/I/71fVoqRC0wL._AC_SL1500_.jpg"},
+      {id:3,name:"iPhone SE (2022)",cat:"apple",price:120000,image:"https://m.media-amazon.com/images/I/71d7rfSl0wL._AC_SL1500_.jpg"}
+    ];
+
+    const productsEl = document.getElementById('products');
+    const searchEl = document.getElementById('search');
+    const cartItemsEl = document.getElementById('cartItems');
+    const totalEl = document.getElementById('total');
+
+    let cart = [];
+
+    function renderProducts(q=""){
+      productsEl.innerHTML='';
+      const list = products.filter(p=> p.name.includes(q));
+      list.forEach(p=>{
+        const card = document.createElement('article'); card.className='card';
+        card.innerHTML = `
+          <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/300x200?text=صورة'" />
+          <h4>${p.name}</h4>
+          <div class="price">${p.price.toLocaleString()} د.ع</div>
+          <div class="actions">
+            <button onclick="addToCart(${p.id})">أضف للسلة</button>
+            <button class="secondary" onclick="viewDetails(${p.id})">التفاصيل</button>
+          </div>`;
+        productsEl.appendChild(card);
+      });
+    }
+
+    function addToCart(id){
+      const p = products.find(x=>x.id===id);
+      const found = cart.find(i=>i.id===id);
+      if(found) found.qty++;
+      else cart.push({id:p.id,name:p.name,price:p.price,qty:1,image:p.image});
+      renderCart();
+    }
+
+    function renderCart(){
+      cartItemsEl.innerHTML='';
+      if(cart.length===0){ cartItemsEl.innerHTML='<div class="empty">السلة فارغة</div>'; totalEl.textContent='0'; return }
+      let tot=0;
+      cart.forEach(it=>{
+        tot += it.price*it.qty;
+        const row = document.createElement('div'); row.className='item';
+        row.innerHTML = `<img src="${it.image}" onerror="this.src='https://via.placeholder.com/80'" /><div style="flex:1"><div>${it.name}</div><div style="color:#777">${it.price.toLocaleString()} د.ع × ${it.qty}</div></div><div><button onclick='changeQty(${it.id},1)'>+</button><button onclick='changeQty(${it.id},-1)'>-</button></div>`;
+        cartItemsEl.appendChild(row);
+      });
+      totalEl.textContent = tot.toLocaleString();
+    }
+
+    function changeQty(id,delta){
+      const it = cart.find(x=>x.id===id); if(!it) return;
+      it.qty += delta; if(it.qty<=0) cart = cart.filter(x=>x.id!==id);
+      renderCart();
+    }
+
+    function viewDetails(id){
+      const p = products.find(x=>x.id===id);
+      alert(p.name + "\\nالسعر: " + p.price.toLocaleString() + " د.ع");
+    }
+
+    searchEl.addEventListener('input',()=> renderProducts(searchEl.value));
+
+    // init: عرض منتجات آبل
+    renderProducts();
+    window.addToCart = addToCart; window.viewDetails = viewDetails; window.changeQty = changeQty;
+  </script>
+</body>
+</html>
